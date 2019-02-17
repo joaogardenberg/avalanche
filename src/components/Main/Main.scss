@@ -1,0 +1,22 @@
+@import 'reset-css';
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.test {
+  &, * {
+    box-shadow: 0 0 0 1px rgba(0, 255, 0, 0.5),
+                0 0 0 10000px rgba(0, 0, 0, 0.2) inset !important;
+  }
+}
+
+.main {
+
+}

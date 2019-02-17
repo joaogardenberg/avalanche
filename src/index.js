@@ -1,12 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import React              from 'react';
+import ReactDOM           from 'react-dom';
+import { Provider }       from 'react-redux';
+import { createStore }    from 'redux';
+import { IntlProvider }   from 'react-intl';
+
+import Main               from './components/Main/Main';
+import Reducers           from './reducers';
+
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <IntlProvider locale="en">
+    <Provider store={ createStore(Reducers) }>
+      <Main />
+    </Provider>
+  </IntlProvider>,
+  document.getElementById('avalanche')
+);
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();

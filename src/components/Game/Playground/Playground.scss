@@ -1,0 +1,68 @@
+.playground {
+  background: #ddd;
+  display: inline-block;
+  max-height: calc(100vh - 40px);
+  overflow: hidden;
+  position: relative;
+
+  .red {
+    background-color: #e6383c;
+  }
+
+  .green {
+    background-color: #3fa85b;
+  }
+
+  .blue {
+    background-color: #468aee;
+  }
+
+  .yellow {
+    background-color: #f9b839;
+  }
+
+  .purple {
+    background-color: purple;
+  }
+}
+
+.grid .cells-row {
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+
+  .cell > div {
+    border-radius: 25%;
+    height: 100%;
+    width: 100%;
+    box-shadow: 0 0 5px 5px rgba(0, 0, 0, .3) inset;
+  }
+}
+
+
+
+.block {
+  position: absolute;
+  transform-origin: 50% 75%;
+  transition: transform .1s;
+
+  .first, .second {
+    > div {
+      border-radius: 25%;
+      box-shadow: 0 0 5px 5px rgba(0, 0, 0, .3) inset;
+    }
+  }
+
+  .second > div {
+    animation: shadow .5s ease-in-out infinite;
+
+    @keyframes shadow {
+      0%, 100% {
+        box-shadow: 0 0 5px 5px rgba(0, 0, 0, .3) inset
+      }
+      50% {
+        box-shadow: 0 0 8px 8px rgba(0, 0, 0, .4) inset;
+      }
+    }
+  }
+}

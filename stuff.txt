@@ -1,0 +1,13 @@
+Coisas a levar em consideração:
+
+- 6x12
+- A peça principal é a de baixo, na posição inicial
+- Rotação: horária ou anti-horária?
+- Rotação: se estiver tocando em alguma parede enquanto estiver em posição
+           vertical, checar se vai sair da tela e empurrar pro lado oposto.
+- Velocidade que vai aumentando bem aos poucos
+- Delay pra "encaixar"
+- Se estiver em posição horizontal, uma das peças pode cair
+- Acima, qual velocidade que a peça cai?
+- As peças de cores iguais se juntam
+- Quão rápido os controles devem funcionar?
