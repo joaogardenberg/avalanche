@@ -504,8 +504,9 @@ class Block extends React.Component {
     const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
-    // Try so that it doesn't throw an error
-    // if it's outside of the screen.
+    // Surround everything with a "try" block
+    // so that it doesn't throw an error if
+    // it's outside of the screen.
     try {
       // Move if nothing is blocking on the left
       if (
@@ -550,8 +551,9 @@ class Block extends React.Component {
     const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
-    // Try so that it doesn't throw an error
-    // if it's outside of the screen.
+    // Surround everything with a "try" block
+    // so that it doesn't throw an error if
+    // it's outside of the screen.
     try {
       // Move if nothing is blocking on the right
       if (
