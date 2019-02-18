@@ -48,6 +48,9 @@ class Block extends React.Component {
           { this.renderBlock(currentBlock[0]) }
         </FirstCell>
         <div className="second">
+          {/*<svg>
+            <path d={ `M${cellSize / 2},0 A${cellSize / 2},${cellSize / 2} 0 1,1 ${cellSize / 2},${cellSize} A${cellSize / 2},${cellSize / 2} 0 1,1 ${cellSize / 2},0` } />
+          </svg>*/}
           { this.renderBlock(currentBlock[1]) }
         </div>
       </div>
