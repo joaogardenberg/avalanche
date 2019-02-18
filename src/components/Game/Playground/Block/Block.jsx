@@ -35,7 +35,7 @@ const FirstCell = posed.div({
 
 class Block extends React.Component {
   render() {
-    const { position: [x, y], rotation } = this.state;
+    const { position: [x, y] }       = this.state;
     const { currentBlock, cellSize } = this.props.game;
 
     if (!currentBlock) {
