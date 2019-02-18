@@ -6,23 +6,23 @@
   position: relative;
 
   .red {
-    background-color: #e6383c;
+    background-color: #e21f24;
   }
 
   .green {
-    background-color: #3fa85b;
+    background-color: #27ad4a;
   }
 
   .blue {
-    background-color: #468aee;
+    background-color: #1E90FF;
   }
 
   .yellow {
-    background-color: #f9b839;
+    background-color: #fcb832;
   }
 
   .purple {
-    background-color: purple;
+    background-color: #9400D3;
   }
 }
 
@@ -32,36 +32,92 @@
   width: 100%;
 
   .cell > div {
-    border-radius: 25%;
+    border-radius: 20%;
     height: 100%;
+    position: relative;
     width: 100%;
-    box-shadow: 0 0 5px 5px rgba(0, 0, 0, .3) inset;
+
+    &.merge-bottom {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    &.merge-left {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+
+    &.merge-right {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &.merge-top {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &::after {
+      background: linear-gradient(160deg, rgba(255, 255, 255, .5) 0%, transparent 50%);
+      background-clip: content-box;
+      border-radius: inherit;
+      box-sizing: border-box;
+      content: '';
+      height: 100%;
+      left: 0;
+      padding: 2px;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
   }
 }
 
-
-
 .block {
   position: absolute;
-  transform-origin: 50% 75%;
-  transition: transform .1s;
+
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: .5;
+  }
 
   .first, .second {
     > div {
-      border-radius: 25%;
-      box-shadow: 0 0 5px 5px rgba(0, 0, 0, .3) inset;
+      border-radius: 20%;
+
+      &::after {
+        background: linear-gradient(160deg, rgba(255, 255, 255, .5) 0%, transparent 50%);
+        background-clip: content-box;
+        border-radius: inherit;
+        box-sizing: border-box;
+        content: '';
+        height: 100%;
+        left: 0;
+        padding: 2px;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
     }
   }
 
-  .second > div {
-    animation: shadow .5s ease-in-out infinite;
+  .first {
+    position: absolute;
+  }
 
-    @keyframes shadow {
-      0%, 100% {
-        box-shadow: 0 0 5px 5px rgba(0, 0, 0, .3) inset
+  .second > div {
+    border: 2px solid transparent;
+    border-color: #fff;
+    animation: border .5s ease-in-out infinite;
+
+    @keyframes border {
+      0%, 60% {
+        border-color: #fff;
       }
-      50% {
-        box-shadow: 0 0 8px 8px rgba(0, 0, 0, .4) inset;
+      40% {
+        border-color: transparent;
       }
     }
   }
