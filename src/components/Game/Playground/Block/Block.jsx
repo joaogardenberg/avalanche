@@ -145,6 +145,10 @@ class Block extends React.Component {
     }
   }
 
+  getAbsRotation(rotation) {
+    return rotation % 4 < 0 ? (rotation % 4 + 4) : (rotation % 4);
+  }
+
   clearAllTimeouts() {
     clearTimeout(this.blockTimeout);
     this.blockTimeout = null;
@@ -158,7 +162,7 @@ class Block extends React.Component {
   blockGravity() {
     const { game: { speed, cellContent } } = this.props;
     const { position: [x, y], rotation }   = this.state;
-    const absRotation = rotation % 4 < 0 ? (rotation % 4 + 4) : (rotation % 4);
+    const absRotation = this.getAbsRotation(rotation);
 
     let maxY;
 
@@ -285,7 +289,7 @@ class Block extends React.Component {
   rotateCounterclockwise() {
     const { game: { cellContent } }      = this.props;
     const { position: [x, y], rotation } = this.state;
-    const absRotation = rotation % 4 < 0 ? (rotation % 4 + 4) : (rotation % 4);
+    const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
     // Try so that it doesn't throw an error
@@ -391,7 +395,7 @@ class Block extends React.Component {
   rotateClockwise() {
     const { game: { cellContent } }      = this.props;
     const { position: [x, y], rotation } = this.state;
-    const absRotation = rotation % 4 < 0 ? (rotation % 4 + 4) : (rotation % 4);
+    const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
     // Try so that it doesn't throw an error
@@ -497,7 +501,7 @@ class Block extends React.Component {
   moveLeft() {
     const { game: { cellContent } }      = this.props;
     const { position: [x, y], rotation } = this.state;
-    const absRotation = rotation % 4 < 0 ? (rotation % 4 + 4) : (rotation % 4);
+    const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
     // Try so that it doesn't throw an error
@@ -543,7 +547,7 @@ class Block extends React.Component {
   moveRight() {
     const { game: { cellContent } }      = this.props;
     const { position: [x, y], rotation } = this.state;
-    const absRotation = rotation % 4 < 0 ? (rotation % 4 + 4) : (rotation % 4);
+    const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
     // Try so that it doesn't throw an error
@@ -589,7 +593,7 @@ class Block extends React.Component {
   placeCells() {
     const { game: { currentBlock, cellContent } } = this.props;
     const { position: [x, y], rotation }          = this.state;
-    const absRotation = rotation % 4 < 0 ? (rotation % 4 + 4) : (rotation % 4);
+    const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
     let firstX, firstY, secondX, secondY;
 
