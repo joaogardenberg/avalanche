@@ -1,5 +1,6 @@
 import React          from 'react';
 import { connect }    from 'react-redux';
+import posed          from 'react-pose';
 
 import * as Constants from '../../../../Constants';
 import { placeCells } from '../../../../actions';
@@ -8,6 +9,29 @@ const INITIAL_STATE = {
   position: [2, -4],
   rotation: 0
 }
+
+const FirstCell = posed.div({
+  bottom: {
+    left: 0,
+    top: ({ cellSize }) => cellSize,
+    transition: { duration: 100 }
+  },
+  left: {
+    left: ({ cellSize }) => -cellSize,
+    top: 0,
+    transition: { duration: 100 }
+  },
+  right: {
+    left: ({ cellSize }) => cellSize,
+    top: 0,
+    transition: { duration: 100 }
+  },
+  top: {
+    left: 0,
+    top: ({ cellSize }) => -cellSize,
+    transition: { duration: 100 }
+  }
+});
 
 class Block extends React.Component {
   render() {
@@ -19,10 +43,10 @@ class Block extends React.Component {
     }
 
     return (
-      <div className="block" style={{ top: y * cellSize, left: x * cellSize, transform: `rotate(${rotation * 90}deg)` }}>
-        <div className="first">
+      <div className="block" style={{ top: y * cellSize, left: x * cellSize }}>
+        <FirstCell className="first" pose={ this.getFirstCellPosition() } cellSize={ cellSize }>
           { this.renderBlock(currentBlock[0]) }
-        </div>
+        </FirstCell>
         <div className="second">
           { this.renderBlock(currentBlock[1]) }
         </div>
@@ -102,6 +126,22 @@ class Block extends React.Component {
       this.moveLeftKeyPressed = false;
     } else if (keyCode === 39) {
       this.moveRightKeyPressed = false;
+    }
+  }
+
+  getFirstCellPosition() {
+    const { rotation } = this.state;
+    const absRotation = this.getAbsRotation(rotation);
+
+    switch (absRotation) {
+      case 1:
+        return 'right';
+      case 2:
+        return 'bottom';
+      case 3:
+        return 'left';
+      default:
+        return 'top';
     }
   }
 
