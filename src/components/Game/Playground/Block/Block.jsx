@@ -580,7 +580,7 @@ class Block extends React.Component {
         ) && !(
           /*
              ───── ─────
-            ▐     ▐  ☼  ▐
+            ▐  ☼  ▐     ▐
              ───── ─────
           */
           absRotation === 1 &&
