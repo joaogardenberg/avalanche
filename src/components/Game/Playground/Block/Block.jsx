@@ -180,9 +180,9 @@ class Block extends React.Component {
                            .findIndex(color => color >= 0);
 
       if (belowFilledY >= 0) {
-        maxY = belowFilledY - 2;
+        maxY = belowFilledY - 1;
       } else {
-        maxY = Constants.ROWS - 2;
+        maxY = Constants.ROWS - 1;
       }
     } else if (absRotation === 1) {
       /*
@@ -205,21 +205,21 @@ class Block extends React.Component {
         if (belowFilledYLeft >= 0 && belowFilledYRight >= 0) {
           // If left is higher than right (yeah, less means higher in that case)
           if (belowFilledYLeft < belowFilledYRight) {
-            maxY = belowFilledYLeft - 2;
+            maxY = belowFilledYLeft - 1;
           // If right is higher than left
           } else {
-            maxY = belowFilledYRight - 2;
+            maxY = belowFilledYRight - 1;
           }
         // If only left one has something below
         } else if (belowFilledYLeft >= 0) {
-          maxY = belowFilledYLeft - 2;
+          maxY = belowFilledYLeft - 1;
         // If only right one has something below
         } else {
-          maxY = belowFilledYRight - 2;
+          maxY = belowFilledYRight - 1;
         }
       // If nothing is below
       } else {
-        maxY = Constants.ROWS - 2;
+        maxY = Constants.ROWS - 1;
       }
     } else if (absRotation === 2) {
       /*
@@ -235,9 +235,9 @@ class Block extends React.Component {
                            .findIndex(color => color >= 0);
 
       if (belowFilledY >= 0) {
-        maxY = belowFilledY - 3;
+        maxY = belowFilledY - 2;
       } else {
-        maxY = Constants.ROWS - 3;
+        maxY = Constants.ROWS - 2;
       }
     } else if (absRotation === 3) {
       /*
@@ -260,21 +260,21 @@ class Block extends React.Component {
         if (belowFilledYLeft >= 0 && belowFilledYRight >= 0) {
           // If left is higher than right (yeah, less means higher in that case)
           if (belowFilledYLeft < belowFilledYRight) {
-            maxY = belowFilledYLeft - 2;
+            maxY = belowFilledYLeft - 1;
           // If right is higher than left
           } else {
-            maxY = belowFilledYRight - 2;
+            maxY = belowFilledYRight - 1;
           }
         // If only left one has something below
         } else if (belowFilledYLeft >= 0) {
-          maxY = belowFilledYLeft - 2;
+          maxY = belowFilledYLeft - 1;
         // If only right one has something below
         } else {
-          maxY = belowFilledYRight - 2;
+          maxY = belowFilledYRight - 1;
         }
       // If nothing is below
       } else {
-        maxY = Constants.ROWS - 2;
+        maxY = Constants.ROWS - 1;
       }
     }
 
@@ -305,7 +305,7 @@ class Block extends React.Component {
         */
         // If it has a wall to the left and nothing
         // to the right, move 1 to the right
-        if (x <= 0 && cellContent[finalY + 1][x + 1] < 0) {
+        if (x <= 0 && cellContent[finalY][x + 1] < 0) {
           this.setState({
             rotation: rotation - 1,
             position: [1, y]
@@ -313,8 +313,8 @@ class Block extends React.Component {
         // If it has a filled block to the left and
         // nothing to the right, move 1 to the right
         } else if (
-          cellContent[finalY + 1][x - 1] > -1 &&
-          cellContent[finalY + 1][x + 1] < 0
+          cellContent[finalY][x - 1] > -1 &&
+          cellContent[finalY][x + 1] < 0
         ) {
           this.setState({
             rotation: rotation - 1,
@@ -322,7 +322,7 @@ class Block extends React.Component {
           });
         // If it doesn't have anything to the left,
         // carry on with the rotation
-        } else if (cellContent[finalY + 1][x - 1] < 0 && x > 0) {
+        } else if (cellContent[finalY][x - 1] < 0 && x > 0) {
           this.setState({ rotation: rotation - 1 });
         }
         // If none of the above happened, do nothing
@@ -352,8 +352,8 @@ class Block extends React.Component {
         // If it has a filled block to the right and
         // nothing to the left, move 1 to the left
         } else if (
-          cellContent[finalY + 1][x + 1] > -1 &&
-          cellContent[finalY + 1][x - 1] < 0
+          cellContent[finalY][x + 1] > -1 &&
+          cellContent[finalY][x - 1] < 0
         ) {
           this.setState({
             rotation: rotation - 1,
@@ -361,7 +361,7 @@ class Block extends React.Component {
           });
         // If it doesn't have anything to the right,
         // carry on with the rotation
-        } else if (cellContent[finalY + 1][x + 1] < 0 && x < Constants.COLUMNS - 1) {
+        } else if (cellContent[finalY][x + 1] < 0 && x < Constants.COLUMNS - 1) {
           this.setState({ rotation: rotation - 1 });
         }
         // If none of the above happened, do nothing
@@ -372,13 +372,13 @@ class Block extends React.Component {
            ───── ─────
         */
         // If touching the floor, move 1 up
-        if (finalY >= Constants.ROWS - 2) {
+        if (finalY >= Constants.ROWS - 1) {
           this.setState({
             rotation: rotation - 1,
-            position: [x, Constants.ROWS - 3]
+            position: [x, Constants.ROWS - 2]
           });
         // If it has a filled block underneath, move 1 up
-        } else if (cellContent[finalY + 2][x] > -1) {
+        } else if (cellContent[finalY + 1][x] > -1) {
           this.setState({
             rotation: rotation - 1,
             position: [x, y - 1]
@@ -411,7 +411,7 @@ class Block extends React.Component {
         */
         // If it has a wall to the right and nothing
         // to the left, move 1 to the left
-        if (x >= Constants.COLUMNS - 1 && cellContent[finalY + 1][x - 1] < 0) {
+        if (x >= Constants.COLUMNS - 1 && cellContent[finalY][x - 1] < 0) {
           this.setState({
             rotation: rotation + 1,
             position: [Constants.COLUMNS - 2, y]
@@ -419,8 +419,8 @@ class Block extends React.Component {
         // If it has a filled block to the right and
         // nothing to the left, move 1 to the left
         } else if (
-          cellContent[finalY + 1][x + 1] > -1 &&
-          cellContent[finalY + 1][x - 1] < 0
+          cellContent[finalY][x + 1] > -1 &&
+          cellContent[finalY][x - 1] < 0
         ) {
           this.setState({
             rotation: rotation + 1,
@@ -428,7 +428,7 @@ class Block extends React.Component {
           });
         // If it doesn't have anything to the right,
         // carry on with the rotation
-        } else if (cellContent[finalY + 1][x + 1] < 0 && x < Constants.COLUMNS - 1) {
+        } else if (cellContent[finalY][x + 1] < 0 && x < Constants.COLUMNS - 1) {
           this.setState({ rotation: rotation + 1 });
         }
         // If none of the above happened, do nothing
@@ -439,13 +439,13 @@ class Block extends React.Component {
            ───── ─────
         */
         // If touching the floor, move 1 up
-        if (finalY >= Constants.ROWS - 2) {
+        if (finalY >= Constants.ROWS - 1) {
           this.setState({
             rotation: rotation + 1,
-            position: [x, Constants.ROWS - 3]
+            position: [x, Constants.ROWS - 2]
           });
         // If it has a filled block underneath, move 1 up
-        } else if (cellContent[finalY + 2][x] > -1) {
+        } else if (cellContent[finalY + 1][x] > -1) {
           this.setState({
             rotation: rotation + 1,
             position: [x, y - 1]
@@ -473,8 +473,8 @@ class Block extends React.Component {
         // If it has a filled block to the left and
         // nothing to the right, move 1 to the right
         } else if (
-          cellContent[finalY + 1][x - 1] > -1 &&
-          cellContent[finalY + 1][x + 1] < 0
+          cellContent[finalY][x - 1] > -1 &&
+          cellContent[finalY][x + 1] < 0
         ) {
           this.setState({
             rotation: rotation + 1,
@@ -482,7 +482,7 @@ class Block extends React.Component {
           });
         // If it doesn't have anything to the right,
         // carry on with the rotation
-        } else if (cellContent[finalY + 1][x - 1] < 0 && x > 0) {
+        } else if (cellContent[finalY][x - 1] < 0 && x > 0) {
           this.setState({ rotation: rotation + 1 });
         }
         // If none of the above happened, do nothing
@@ -518,7 +518,7 @@ class Block extends React.Component {
              ─────
           */
           (absRotation === 0 || absRotation === 1) &&
-          (x <= 0 || cellContent[finalY + 1][x - 1] > -1)
+          (x <= 0 || cellContent[finalY][x - 1] > -1)
         ) && !(
           /*
              ─────
@@ -528,7 +528,7 @@ class Block extends React.Component {
              ─────
           */
           absRotation === 2 &&
-          (x <= 0 || cellContent[finalY + 2][x - 1] > -1)
+          (x <= 0 || cellContent[finalY + 1][x - 1] > -1)
         ) && !(
           /*
              ───── ─────
@@ -536,7 +536,7 @@ class Block extends React.Component {
              ───── ─────
           */
           absRotation === 3 &&
-          (x <= 1 || cellContent[finalY + 1][x - 2] > -1)
+          (x <= 1 || cellContent[finalY][x - 2] > -1)
         )
       ) {
         this.setState({ position: [x - 1, y] });
@@ -564,7 +564,7 @@ class Block extends React.Component {
              ─────
           */
           (absRotation === 0 || absRotation === 3) &&
-          (x >= Constants.COLUMNS - 1 || cellContent[finalY + 1][x + 1] > -1)
+          (x >= Constants.COLUMNS - 1 || cellContent[finalY][x + 1] > -1)
         ) && !(
           /*
              ─────
@@ -574,7 +574,7 @@ class Block extends React.Component {
              ─────
           */
           absRotation === 2 &&
-          (x >= Constants.COLUMNS - 1 || cellContent[finalY + 2][x + 1] > -1)
+          (x >= Constants.COLUMNS - 1 || cellContent[finalY + 1][x + 1] > -1)
         ) && !(
           /*
              ───── ─────
@@ -582,7 +582,7 @@ class Block extends React.Component {
              ───── ─────
           */
           absRotation === 1 &&
-          (x >= Constants.COLUMNS - 2 || cellContent[finalY + 1][x + 2] > -1)
+          (x >= Constants.COLUMNS - 2 || cellContent[finalY][x + 2] > -1)
         )
       ) {
         this.setState({ position: [x + 1, y] });
