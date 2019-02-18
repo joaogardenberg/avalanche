@@ -6,7 +6,7 @@ import * as Constants from '../../../../Constants';
 import { placeCells } from '../../../../actions';
 
 const INITIAL_STATE = {
-  position: [2, -4],
+  position: [2, -2],
   rotation: 0
 }
 
