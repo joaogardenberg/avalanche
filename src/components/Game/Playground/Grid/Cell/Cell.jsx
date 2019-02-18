@@ -13,14 +13,20 @@ let Cell = props => {
   );
 }
 
-const renderContent = ({ content }) => {
+const renderContent = ({ content, mergeBottom, mergeLeft, mergeRight, mergeTop }) => {
   if (content < 0 ) {
     return null;
   }
 
   const color = Constants.getColor(content);
+  let classes = '';
 
-  return <div className={ color } />;
+  classes += mergeBottom ? ' merge-bottom' : '';
+  classes += mergeLeft   ? ' merge-left'   : '';
+  classes += mergeRight  ? ' merge-right'  : '';
+  classes += mergeTop    ? ' merge-top'    : '';
+
+  return <div className={ `${color}${classes}` } />;
 }
 
 const mapStateToProps = ({ game: { cellSize } }) => {
