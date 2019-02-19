@@ -44,7 +44,7 @@ class Block extends React.Component {
 
     return (
       <div className="block" style={{ top: y * cellSize, left: x * cellSize }}>
-        <FirstCell className="first" pose={ this.getFirstCellPosition() } cellSize={ cellSize }>
+        <FirstCell className="first" pose={ this.getFirstCellPosition() } cellSize={ cellSize } poseKey={ cellSize }>
           { this.renderBlock(currentBlock[0]) }
         </FirstCell>
         <div className="second">
