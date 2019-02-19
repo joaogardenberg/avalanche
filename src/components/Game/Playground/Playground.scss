@@ -75,6 +75,7 @@
 
 .block {
   position: absolute;
+  z-index: 10000;
 
   svg {
     position: absolute;
@@ -105,12 +106,13 @@
 
   .first {
     position: absolute;
+    z-index: -1;
   }
 
   .second > div {
+    animation: border .5s ease-in-out infinite;
     border: 2px solid transparent;
     border-color: #fff;
-    animation: border .5s ease-in-out infinite;
 
     @keyframes border {
       0%, 60% {
