@@ -116,6 +116,13 @@ class Block extends React.Component {
     window.addEventListener('keyup', this.onKeyUp.bind(this));
   }
 
+  componentDidUpdate() {
+    if (this.state.shouldPlaceBlock) {
+      this.placeBlock();
+      this.setState({ shouldPlaceBlock: false });
+    }
+  }
+
   componentWillUnmount() {
     this.clearAllTimeouts();
     this.clearAllEventListeners();
@@ -127,7 +134,7 @@ class Block extends React.Component {
     }
 
     if (keyCode === 32) {
-      this.placeCells();
+      this.setState({ shouldPlaceBlock: true });
     } else if (keyCode === 67) {
       if (!this.rotateCounterclockwiseKeyPressed) {
         this.rotateCounterclockwise();
@@ -519,29 +526,36 @@ class Block extends React.Component {
         }
         // If none of the above happened, do nothing
       } else if (absRotation === 1) {
+  checkForBlockPlacement() {
+    const { game: { cellContent } }      = this.props;
+    const { position: [x, y], rotation } = this.state;
+    const absRotation = this.getAbsRotation(rotation);
+
+    if (!Number.isInteger(y) || this.placeBlockTimeout) {
+      return;
+    }
+
+    switch (absRotation) {
+      case 1:
         /*
            ───── ─────
           ▐  ☼  ▐     ▐
            ───── ─────
         */
-        // If touching the floor, move 1 up
-        if (finalY >= Constants.ROWS - 1) {
-          this.setState({
-            rotation: rotation + 1,
-            position: [x, Constants.ROWS - 2]
-          });
-        // If it has a filled block underneath, move 1 up
-        } else if (cellContent[finalY + 1][x] > -1) {
-          this.setState({
-            rotation: rotation + 1,
-            position: [x, y - 1]
-          });
-        // If none of the above happened, carry on
-        // with the rotation
+        if (y < 0) {
+          if (y === -1 && (cellContent[0][x] > -1 || cellContent[0][x + 1] > -1)) {
+            this.startPlacingBlock();
+          }
+        } else if (y < Constants.ROWS - 2) {
+          if (cellContent[y + 1][x] > -1 || cellContent[y + 1][x + 1] > -1) {
+            this.startPlacingBlock();
+          }
         } else {
-          this.setState({ rotation: rotation + 1 });
+          this.startPlacingBlock();
         }
-      } else if (absRotation === 2) {
+
+        break;
+      case 2:
         /*
            ─────
           ▐  ☼  ▐
@@ -549,141 +563,80 @@ class Block extends React.Component {
           ▐     ▐
            ─────
         */
-        // If it has a wall to the left and nothing
-        // to the right, move 1 to the right
-        if (x <= 0 && cellContent[finalY][x + 1] < 0) {
-          this.setState({
-            rotation: rotation + 1,
-            position: [1, y]
-          });
-        // If it has a filled block to the left and
-        // nothing to the right, move 1 to the right
-        } else if (
-          cellContent[finalY][x - 1] > -1 &&
-          cellContent[finalY][x + 1] < 0
-        ) {
-          this.setState({
-            rotation: rotation + 1,
-            position: [x + 1, y]
-          });
-        // If it doesn't have anything to the right,
-        // carry on with the rotation
-        } else if (cellContent[finalY][x - 1] < 0 && x > 0) {
-          this.setState({ rotation: rotation + 1 });
+        if (y < 0) {
+          if (cellContent[0][x] > -1) {
+            this.startPlacingBlock();
+          }
+        } else if (y < Constants.ROWS - 3) {
+          if (cellContent[y + 2][x] > -1) {
+            this.startPlacingBlock();
+          }
+        } else {
+          this.startPlacingBlock();
         }
-        // If none of the above happened, do nothing
-      } else if (absRotation === 3) {
+
+        break;
+      case 3:
         /*
            ───── ─────
           ▐     ▐  ☼  ▐
            ───── ─────
         */
-        // Nothing can block this from happening
-        this.setState({ rotation: rotation + 1 });
-      }
-    } catch(error) {}
+        if (y < 0) {
+          if (y === -1 && (cellContent[0][x] > -1 || cellContent[0][x - 1] > -1)) {
+            this.startPlacingBlock();
+          }
+        } else if (y < Constants.ROWS - 2) {
+          if (cellContent[y + 1][x] > -1 || cellContent[y + 1][x - 1] > -1) {
+            this.startPlacingBlock();
+          }
+        } else {
+          this.startPlacingBlock();
+        }
+
+        break;
+      default:
+        /*
+           ─────
+          ▐     ▐
+           ─────
+          ▐  ☼  ▐
+           ─────
+        */
+        if (y < 0) {
+          if (y === -1 && cellContent[0][x] > -1) {
+            this.startPlacingBlock();
+          }
+        } else if (y < Constants.ROWS - 2) {
+          if (cellContent[y + 1][x] > -1) {
+            this.startPlacingBlock();
+          }
+        } else {
+          this.startPlacingBlock();
+        }
+    }
   }
 
-  moveLeft() {
-    const { game: { cellContent } }      = this.props;
-    const { position: [x, y], rotation } = this.state;
-    const absRotation = this.getAbsRotation(rotation);
-    const finalY = Math.ceil(y);
+  startPlacingBlock() {
+    const { fullGravity } = this.state;
 
-    // Surround everything with a "try" block
-    // so that it doesn't throw an error if
-    // it's outside of the screen.
-    try {
-      // Move if nothing is blocking on the left
-      if (
-        !(
-          /*
-             ─────
-            ▐     ▐         ───── ─────
-             ─────    or   ▐  ☼  ▐     ▐
-            ▐  ☼  ▐         ───── ─────
-             ─────
-          */
-          (absRotation === 0 || absRotation === 1) &&
-          (x <= 0 || cellContent[finalY][x - 1] > -1)
-        ) && !(
-          /*
-             ─────
-            ▐  ☼  ▐
-             ─────
-            ▐     ▐
-             ─────
-          */
-          absRotation === 2 &&
-          (x <= 0 || cellContent[finalY + 1][x - 1] > -1)
-        ) && !(
-          /*
-             ───── ─────
-            ▐     ▐  ☼  ▐
-             ───── ─────
-          */
-          absRotation === 3 &&
-          (x <= 1 || cellContent[finalY][x - 2] > -1)
-        )
-      ) {
-        this.setState({ position: [x - 1, y] });
-      }
-    } catch(error) {}
+    if (fullGravity) {
+      this.setState({ shouldPlaceBlock: true });
+    } else {
+      this.placeBlockTimeout = setTimeout(
+        () => this.setState({ shouldPlaceBlock: true }),
+        Constants.PLACE_BLOCK_DELAY
+      );
+    }
   }
 
-  moveRight() {
-    const { game: { cellContent } }      = this.props;
-    const { position: [x, y], rotation } = this.state;
-    const absRotation = this.getAbsRotation(rotation);
-    const finalY = Math.ceil(y);
-
-    // Surround everything with a "try" block
-    // so that it doesn't throw an error if
-    // it's outside of the screen.
-    try {
-      // Move if nothing is blocking on the right
-      if (
-        !(
-          /*
-             ─────
-            ▐     ▐         ───── ─────
-             ─────    or   ▐     ▐  ☼  ▐
-            ▐  ☼  ▐         ───── ─────
-             ─────
-          */
-          (absRotation === 0 || absRotation === 3) &&
-          (x >= Constants.COLUMNS - 1 || cellContent[finalY][x + 1] > -1)
-        ) && !(
-          /*
-             ─────
-            ▐  ☼  ▐
-             ─────
-            ▐     ▐
-             ─────
-          */
-          absRotation === 2 &&
-          (x >= Constants.COLUMNS - 1 || cellContent[finalY + 1][x + 1] > -1)
-        ) && !(
-          /*
-             ───── ─────
-            ▐  ☼  ▐     ▐
-             ───── ─────
-          */
-          absRotation === 1 &&
-          (x >= Constants.COLUMNS - 2 || cellContent[finalY][x + 2] > -1)
-        )
-      ) {
-        this.setState({ position: [x + 1, y] });
-      }
-    } catch(error) {}
-  }
-
-  placeCells() {
-    const { game: { currentBlock, cellContent } } = this.props;
-    const { position: [x, y], rotation }          = this.state;
+  placeBlock() {
+    const { game: { currentBlock, cellContent, cellDelay } } = this.props;
+    const { position: [x, y], rotation }                     = this.state;
     const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
     let firstX, firstY, secondX, secondY;
+    let firstDifference = 0, secondDifference = 0;
 
     // Getting the coordinates of the 2 cells
     // depending on the position and the rotation
@@ -720,6 +673,9 @@ class Block extends React.Component {
         } else {
           secondY = belowFilledYLeft - 1;
         }
+
+        firstDifference = firstY - y;
+        secondDifference = secondY - y;
 
         break;
       case 2:
@@ -781,6 +737,10 @@ class Block extends React.Component {
         } else {
           secondY = belowFilledYRight - 1;
         }
+
+        firstDifference = firstY - y;
+        secondDifference = secondY - y;
+
         break;
       default:
         /*
@@ -809,19 +769,72 @@ class Block extends React.Component {
         }
     }
 
-    // Placing both of the cells
-    this.props.placeCells([{
-      x: firstX,
-      y: firstY,
-      color: currentBlock[0]
-    }, {
-      x: secondX,
-      y: secondY,
-      color: currentBlock[1]
-    }]);
+    let gameOver = false;
 
-    // Next block
-    this.setState(INITIAL_STATE);
+    if (firstY < 0 || secondY < 0) {
+      gameOver = true;
+    }
+
+    if (gameOver) {
+      alert('Game over!');
+    } else {
+      this.setState({
+        shouldFall: false,
+        shouldBlink: false,
+        firstFall: firstDifference,
+        currentFirstFall: 0,
+        secondFall: secondDifference,
+        currentSecondFall: 0,
+        blockInput: true
+      });
+
+      // Sleep for the time required to place the cells
+      new Promise(resolve => {
+        this.animationInterval = setInterval(() => {
+          const { firstFall, currentFirstFall, secondFall } = this.state;
+          const { currentSecondFall }                       = this.state;
+
+          if (currentFirstFall >= firstFall && currentSecondFall >= secondFall) {
+            clearInterval(this.animationInterval);
+            this.animationInterval = null;
+            resolve();
+          } else {
+            let newState = {};
+
+            if (currentFirstFall < firstFall) {
+              newState.currentFirstFall = currentFirstFall + .5;
+            }
+
+            if (currentSecondFall < secondFall) {
+              newState.currentSecondFall = currentSecondFall + .5;
+            }
+
+            this.setState(newState);
+          }
+        }, 30);
+      }).then(() => {
+        // Placing both of the cells
+        this.props.placeCells([{
+          x: firstX,
+          y: firstY,
+          color: currentBlock[0]
+        }, {
+          x: secondX,
+          y: secondY,
+          color: currentBlock[1]
+        }]);
+
+        this.setState(INITIAL_CELL_POSITION);
+
+        // Sleep for <cellDelay> ms
+        this.sleep(cellDelay).then(() => {
+          // Next block
+          this.setState(INITIAL_STATE_WITHOUT_KEYS_PRESSED);
+        });
+      });
+    }
+  }
+
   }
 }
 
