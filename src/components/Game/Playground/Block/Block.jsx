@@ -236,7 +236,15 @@ class Block extends React.Component {
 
   clearAllTimeouts() {
     clearTimeout(this.blockTimeout);
+    clearTimeout(this.sleepTimeout);
+    clearTimeout(this.placeBlockTimeout);
+    clearInterval(this.animationInterval);
+    clearInterval(this.keysPressedInterval);
     this.blockTimeout = null;
+    this.sleepTimeout = null;
+    this.placeBlockTimeout = null;
+    this.animationInterval = null;
+    this.keysPressedInterval = null;
   }
 
   clearAllEventListeners() {
