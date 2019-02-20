@@ -105,8 +105,8 @@ class Block extends React.Component {
 
     this.rotateCounterclockwiseKeyPressed = false;
     this.rotateClockwiseKeyPressed        = false;
-    this.moveLeftKeyPressed               = false;
-    this.moveRightKeyPressed              = false;
+    this.firstLeftMovement                = true;
+    this.firstRightMovement               = true;
   }
 
   componentDidMount() {
