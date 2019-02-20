@@ -69,7 +69,7 @@ const FirstCell = posed.div({
 
 class Block extends React.Component {
   render() {
-    const { position: [x, y] }       = this.state;
+    const { shouldBlink }            = this.state;
     const { currentBlock, cellSize } = this.props.game;
 
     if (!currentBlock) {
@@ -77,11 +77,11 @@ class Block extends React.Component {
     }
 
     return (
-      <div className="block" style={{ top: y * cellSize, left: x * cellSize }}>
-        <FirstCell className="first" pose={ this.getFirstCellPosition() } cellSize={ cellSize } poseKey={ cellSize }>
+      <div className="block" style={ this.getBlockStyle() }>
+        <FirstCell className="first" pose={ this.getFirstCellPosition() } cellSize={ cellSize } poseKey={ cellSize } style={ this.getFirstCellStyle() }>
           { this.renderBlock(currentBlock[0]) }
         </FirstCell>
-        <div className="second">
+        <div className={ `second${shouldBlink ? ' blinking' : ''}` } style={ this.getSecondCellStyle() }>
           {/*<svg>
             <path d={ `M${cellSize / 2},0 A${cellSize / 2},${cellSize / 2} 0 1,1 ${cellSize / 2},${cellSize} A${cellSize / 2},${cellSize / 2} 0 1,1 ${cellSize / 2},0` } />
           </svg>*/}
