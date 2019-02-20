@@ -307,12 +307,144 @@ class Block extends React.Component {
   }
 
   blockGravity() {
-    const { game: { speed, cellContent } } = this.props;
-    const { position: [x, y], rotation }   = this.state;
-    const absRotation = this.getAbsRotation(rotation);
+    const { game: { cellContent } }                  = this.props;
+    const { position: [x, y], rotation, shouldFall } = this.state;
 
-    let maxY;
+    if (shouldFall) {
+      const absRotation = this.getAbsRotation(rotation);
+
+      let maxY;
+
+      if (absRotation === 0) {
+        /*
+           ─────
+          ▐     ▐
+           ─────
+          ▐  ☼  ▐
+           ─────
+        */
+        // Checking if the column has anything below
+        const belowFilledY = cellContent
+                             .map(line => line[x])
+                             .findIndex(color => color >= 0);
+
+        if (belowFilledY >= 0) {
+          maxY = belowFilledY - 1;
+        } else {
+          maxY = Constants.ROWS - 1;
+        }
+      } else if (absRotation === 1) {
+        /*
+           ───── ─────
+          ▐  ☼  ▐     ▐
+           ───── ─────
+        */
+        // Checking if the 2 columns have anything below
+        const belowFilledYLeft = cellContent
+                                 .map(line => line[x])
+                                 .findIndex(color => color >= 0);
+
+        const belowFilledYRight = cellContent
+                                  .map(line => line[x + 1])
+                                  .findIndex(color => color >= 0);
+
+        // If any of the lines have something below
+        if (belowFilledYLeft >= 0 || belowFilledYRight >= 0) {
+          // If both lines have something below
+          if (belowFilledYLeft >= 0 && belowFilledYRight >= 0) {
+            // If left is higher than right (yeah, less means higher in that case)
+            if (belowFilledYLeft < belowFilledYRight) {
+              maxY = belowFilledYLeft - 1;
+            // If right is higher than left
+            } else {
+              maxY = belowFilledYRight - 1;
+            }
+          // If only left one has something below
+          } else if (belowFilledYLeft >= 0) {
+            maxY = belowFilledYLeft - 1;
+          // If only right one has something below
+          } else {
+            maxY = belowFilledYRight - 1;
+          }
+        // If nothing is below
+        } else {
+          maxY = Constants.ROWS - 1;
+        }
+      } else if (absRotation === 2) {
+        /*
+           ─────
+          ▐  ☼  ▐
+           ─────
+          ▐     ▐
+           ─────
+        */
+        // Checking if the column has anything below
+        const belowFilledY = cellContent
+                             .map(line => line[x])
+                             .findIndex(color => color >= 0);
+
+        if (belowFilledY >= 0) {
+          maxY = belowFilledY - 2;
+        } else {
+          maxY = Constants.ROWS - 2;
+        }
+      } else if (absRotation === 3) {
+        /*
+           ───── ─────
+          ▐     ▐  ☼  ▐
+           ───── ─────
+        */
+        // Checking if the 2 columns have anything below
+        const belowFilledYLeft = cellContent
+                                 .map(line => line[x - 1])
+                                 .findIndex(color => color >= 0);
+
+        const belowFilledYRight = cellContent
+                                  .map(line => line[x])
+                                  .findIndex(color => color >= 0);
+
+        // If any of the lines have something below
+        if (belowFilledYLeft >= 0 || belowFilledYRight >= 0) {
+          // If both lines have something below
+          if (belowFilledYLeft >= 0 && belowFilledYRight >= 0) {
+            // If left is higher than right (yeah, less means higher in that case)
+            if (belowFilledYLeft < belowFilledYRight) {
+              maxY = belowFilledYLeft - 1;
+            // If right is higher than left
+            } else {
+              maxY = belowFilledYRight - 1;
+            }
+          // If only left one has something below
+          } else if (belowFilledYLeft >= 0) {
+            maxY = belowFilledYLeft - 1;
+          // If only right one has something below
+          } else {
+            maxY = belowFilledYRight - 1;
+          }
+        // If nothing is below
+        } else {
+          maxY = Constants.ROWS - 1;
+        }
+      }
+
+      if (y < maxY) {
+        this.setState({ position: [x, y + .5] });
+
+        if (this.placeBlockTimeout) {
+          clearTimeout(this.placeBlockTimeout);
+          this.placeBlockTimeout = null;
+        }
+      }
+
+      this.checkForBlockPlacement();
+    }
+
+
+
+    // Make it so it checkes again in <gravity> miliseconds
     this.blockTimeout = setTimeout(this.blockGravity.bind(this), this.getGravity())
+  }
+
   getGravity() {
     const { game: { speed } } = this.props;
     const { fullGravity }     = this.state;
