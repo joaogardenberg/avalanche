@@ -110,7 +110,8 @@ class Block extends React.Component {
   }
 
   componentDidMount() {
-    this.blockTimeout = setTimeout(this.blockGravity.bind(this), (11 - this.props.game.speed) * 30);
+    this.initBlockTimeout();
+    this.initKeysPressedInterval();
     window.addEventListener('keydown', this.onKeyDown.bind(this));
     window.addEventListener('keyup', this.onKeyUp.bind(this));
   }
@@ -166,6 +167,26 @@ class Block extends React.Component {
     }
   }
 
+  initBlockTimeout() {
+    this.blockTimeout = setTimeout(this.blockGravity.bind(this), (11 - this.props.game.speed) * 30);
+  }
+
+  initKeysPressedInterval() {
+    clearInterval(this.keysPressedInterval);
+    this.keysPressedInterval = setInterval(this.keysPressedChecker.bind(this), 30);
+  }
+
+  getBlockStyle() {
+    const { game: { cellSize } } = this.props;
+    const { position: [x, y] }   = this.state;
+
+    return {
+      top: y * cellSize,
+      left: x * cellSize,
+      transition: y === INITIAL_POSITION[1] ? 'none' : `top ${this.getGravity() / 1000}s`
+    };
+  }
+
   getFirstCellPosition() {
     const { rotation } = this.state;
     const absRotation = this.getAbsRotation(rotation);
@@ -179,6 +200,26 @@ class Block extends React.Component {
         return 'left';
       default:
         return 'top';
+    }
+  }
+
+  getFirstCellStyle() {
+    const { game: { cellSize } }          = this.props;
+    const { firstFall, currentFirstFall } = this.state;
+
+    return firstFall === 0 || currentFirstFall > firstFall ? {} : {
+      transform: `translateY(${currentFirstFall * cellSize}px)`,
+      transition: 'transform .03s'
+    }
+  }
+
+  getSecondCellStyle() {
+    const { game: { cellSize } }            = this.props;
+    const { secondFall, currentSecondFall } = this.state;
+
+    return secondFall === 0 || currentSecondFall > secondFall ? {} : {
+      transform: `translateY(${currentSecondFall * cellSize}px)`,
+      transition: 'transform .03s'
     }
   }
 
@@ -202,6 +243,14 @@ class Block extends React.Component {
     const absRotation = this.getAbsRotation(rotation);
 
     let maxY;
+    this.blockTimeout = setTimeout(this.blockGravity.bind(this), this.getGravity())
+  getGravity() {
+    const { game: { speed } } = this.props;
+    const { fullGravity }     = this.state;
+
+    return (11 - (fullGravity ? 10 : speed)) * 30
+  }
+
 
     if (absRotation === 0) {
       /*
