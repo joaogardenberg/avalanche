@@ -32,30 +32,9 @@
   width: 100%;
 
   .cell > div {
-    border-radius: 20%;
     height: 100%;
     position: relative;
     width: 100%;
-
-    &.merge-bottom {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-
-    &.merge-left {
-      border-bottom-left-radius: 0;
-      border-top-left-radius: 0;
-    }
-
-    &.merge-right {
-      border-bottom-right-radius: 0;
-      border-top-right-radius: 0;
-    }
-
-    &.merge-top {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
 
     &::after {
       background: linear-gradient(160deg, rgba(255, 255, 255, .5) 0%, transparent 50%);
@@ -109,18 +88,23 @@
     z-index: -1;
   }
 
-  .second > div {
-    animation: border .5s ease-in-out infinite;
-    border: 2px solid transparent;
-    border-color: #fff;
+  .second {
+    &.blinking > div {
+      animation: border .5s ease-in-out infinite;
+      border-color: #fff;
 
-    @keyframes border {
-      0%, 60% {
-        border-color: #fff;
+      @keyframes border {
+        0%, 60% {
+          border-color: #fff;
+        }
+        40% {
+          border-color: transparent;
+        }
       }
-      40% {
-        border-color: transparent;
-      }
+    }
+
+    > div {
+      border: 2px solid transparent;
     }
   }
 }
