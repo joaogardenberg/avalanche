@@ -5,10 +5,44 @@ import posed          from 'react-pose';
 import * as Constants from '../../../../Constants';
 import { placeCells } from '../../../../actions';
 
+const INITIAL_POSITION = [2, -1];
+
+const INITIAL_CELL_POSITION = {
+  position: INITIAL_POSITION,
+  rotation: 0,
+  firstFall: 0,
+  currentFirstFall: 0,
+  secondFall: 0,
+  currentSecondFall: 0
+};
+
+const INITIAL_CELL_PROPERTIES = {
+  shouldFall: true,
+  shouldBlink: true,
+  shouldPlaceBlock: false
+};
+
+const INITIAL_PROPERTIES = {
+  blockInput: false
+};
+
+const INITIAL_KEYS_PRESSED = {
+  fullGravity: false,
+  keysPressed: {}
+};
+
 const INITIAL_STATE = {
-  position: [2, -2],
-  rotation: 0
-}
+  ...INITIAL_CELL_POSITION,
+  ...INITIAL_CELL_PROPERTIES,
+  ...INITIAL_PROPERTIES,
+  ...INITIAL_KEYS_PRESSED
+};
+
+const INITIAL_STATE_WITHOUT_KEYS_PRESSED = {
+  ...INITIAL_CELL_POSITION,
+  ...INITIAL_CELL_PROPERTIES,
+  ...INITIAL_PROPERTIES
+};
 
 const FirstCell = posed.div({
   bottom: {
