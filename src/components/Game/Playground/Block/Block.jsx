@@ -258,6 +258,11 @@ class Block extends React.Component {
     return (11 - (fullGravity ? 10 : speed)) * 30
   }
 
+  rotateCounterclockwise() {
+    const { game: { cellContent } }      = this.props;
+    const { position: [x, y], rotation } = this.state;
+    const absRotation = this.getAbsRotation(rotation);
+    const finalY = Math.ceil(y);
 
     if (absRotation === 0) {
       /*
@@ -267,52 +272,203 @@ class Block extends React.Component {
         ▐  ☼  ▐
          ─────
       */
-      // Checking if the column has anything below
-      const belowFilledY = cellContent
-                           .map(line => line[x])
-                           .findIndex(color => color >= 0);
-
-      if (belowFilledY >= 0) {
-        maxY = belowFilledY - 1;
-      } else {
-        maxY = Constants.ROWS - 1;
+      // If it's outside the playground and it
+      // has a wall to the left
+      if (finalY < 0 && x <= 0) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [1, y]
+        });
+      // If it's outside the playground
+      } else if (finalY < 0) {
+        this.setState({ rotation: rotation - 1 });
+      // If it has a wall to the left and nothing
+      // to the right, move 1 to the right
+      } else if (x <= 0 && cellContent[finalY][x + 1] < 0) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [1, y]
+        });
+      // If it has a filled block to the left and
+      // nothing to the right, move 1 to the right
+      } else if (
+        cellContent[finalY][x - 1] > -1 &&
+        cellContent[finalY][x + 1] < 0
+      ) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [x + 1, y]
+        });
+      // If it doesn't have anything to the left,
+      // carry on with the rotation
+      } else if (cellContent[finalY][x - 1] < 0 && x > 0) {
+        this.setState({ rotation: rotation - 1 });
       }
+      // If none of the above happened, do nothing
     } else if (absRotation === 1) {
       /*
          ───── ─────
         ▐  ☼  ▐     ▐
          ───── ─────
       */
-      // Checking if the 2 columns have anything below
-      const belowFilledYLeft = cellContent
-                               .map(line => line[x])
-                               .findIndex(color => color >= 0);
-
-      const belowFilledYRight = cellContent
-                                .map(line => line[x + 1])
-                                .findIndex(color => color >= 0);
-
-      // If any of the lines have something below
-      if (belowFilledYLeft >= 0 || belowFilledYRight >= 0) {
-        // If both lines have something below
-        if (belowFilledYLeft >= 0 && belowFilledYRight >= 0) {
-          // If left is higher than right (yeah, less means higher in that case)
-          if (belowFilledYLeft < belowFilledYRight) {
-            maxY = belowFilledYLeft - 1;
-          // If right is higher than left
-          } else {
-            maxY = belowFilledYRight - 1;
-          }
-        // If only left one has something below
-        } else if (belowFilledYLeft >= 0) {
-          maxY = belowFilledYLeft - 1;
-        // If only right one has something below
-        } else {
-          maxY = belowFilledYRight - 1;
-        }
-      // If nothing is below
+      // Nothing can block this from happening
+      this.setState({ rotation: rotation - 1 });
+    } else if (absRotation === 2) {
+      /*
+         ─────
+        ▐  ☼  ▐
+         ─────
+        ▐     ▐
+         ─────
+      */
+      // If it's outside the playground and it
+      // has a wall to the right
+      if (finalY < 0 && x >= Constants.COLUMNS - 1) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [Constants.COLUMNS - 2, y]
+        });
+      // If it's outside the playground
+      } else if (finalY < 0) {
+        this.setState({ rotation: rotation - 1 });
+      // If it has a wall to the right and nothing
+      // to the left, move 1 to the left
+      } else if (x >= Constants.COLUMNS - 1 && cellContent[finalY][x - 1] < 0) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [Constants.COLUMNS - 2, y]
+        });
+      // If it has a filled block to the right and
+      // nothing to the left, move 1 to the left
+      } else if (
+        cellContent[finalY][x + 1] > -1 &&
+        cellContent[finalY][x - 1] < 0
+      ) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [x - 1, y]
+        });
+      // If it doesn't have anything to the right,
+      // carry on with the rotation
+      } else if (cellContent[finalY][x + 1] < 0 && x < Constants.COLUMNS - 1) {
+        this.setState({ rotation: rotation - 1 });
+      }
+      // If none of the above happened, do nothing
+    } else if (absRotation === 3) {
+      /*
+         ───── ─────
+        ▐     ▐  ☼  ▐
+         ───── ─────
+      */
+      // If it's outside the playground and
+      // there's something below
+      if (finalY < 0 && finalY === -1 && cellContent[finalY + 1][x] > -1) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [x, finalY - 1]
+        });
+      // If it's outside the playground
+      } else if (finalY < 0) {
+        this.setState({ rotation: rotation - 1 });
+      // If touching the floor, move 1 up
+      } else if (finalY >= Constants.ROWS - 1) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [x, Constants.ROWS - 2]
+        });
+      // If it has a filled block underneath, move 1 up
+      } else if (cellContent[finalY + 1][x] > -1) {
+        this.setState({
+          rotation: rotation - 1,
+          position: [x, finalY - 1]
+        });
+      // If none of the above happened, carry on
+      // with the rotation
       } else {
-        maxY = Constants.ROWS - 1;
+        this.setState({ rotation: rotation - 1 });
+      }
+    }
+  }
+
+  rotateClockwise() {
+    const { game: { cellContent } }      = this.props;
+    const { position: [x, y], rotation } = this.state;
+    const absRotation = this.getAbsRotation(rotation);
+    const finalY = Math.ceil(y);
+
+    if (absRotation === 0) {
+      /*
+         ─────
+        ▐     ▐
+         ─────
+        ▐  ☼  ▐
+         ─────
+      */
+      // If it's outside the playground and it
+      // has a wall to the right
+      if (finalY < 0 && x >= Constants.COLUMNS - 1) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [Constants.COLUMNS - 2, y]
+        });
+      // If it's outside the playground
+      } else if (finalY < 0) {
+        this.setState({ rotation: rotation + 1 });
+      // If it has a wall to the right and nothing
+      // to the left, move 1 to the left
+      } else if (x >= Constants.COLUMNS - 1 && cellContent[finalY][x - 1] < 0) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [Constants.COLUMNS - 2, y]
+        });
+      // If it has a filled block to the right and
+      // nothing to the left, move 1 to the left
+      } else if (
+        cellContent[finalY][x + 1] > -1 &&
+        cellContent[finalY][x - 1] < 0
+      ) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [x - 1, y]
+        });
+      // If it doesn't have anything to the right,
+      // carry on with the rotation
+      } else if (cellContent[finalY][x + 1] < 0 && x < Constants.COLUMNS - 1) {
+        this.setState({ rotation: rotation + 1 });
+      }
+      // If none of the above happened, do nothing
+    } else if (absRotation === 1) {
+      /*
+         ───── ─────
+        ▐  ☼  ▐     ▐
+         ───── ─────
+      */
+      // If it's outside the playground and
+      // there's something below
+      if (finalY < 0 && finalY === -1 && cellContent[finalY + 1][x] > -1) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [x, finalY - 1]
+        });
+      // If it's outside the playground
+      } else if (finalY < 0) {
+        this.setState({ rotation: rotation + 1 });
+      // If touching the floor, move 1 up
+      } else if (finalY >= Constants.ROWS - 1) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [x, Constants.ROWS - 2]
+        });
+      // If it has a filled block underneath, move 1 up
+      } else if (cellContent[finalY + 1][x] > -1) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [x, finalY - 1]
+        });
+      // If none of the above happened, carry on
+      // with the rotation
+      } else {
+        this.setState({ rotation: rotation + 1 });
       }
     } else if (absRotation === 2) {
       /*
@@ -322,112 +478,72 @@ class Block extends React.Component {
         ▐     ▐
          ─────
       */
-      // Checking if the column has anything below
-      const belowFilledY = cellContent
-                           .map(line => line[x])
-                           .findIndex(color => color >= 0);
-
-      if (belowFilledY >= 0) {
-        maxY = belowFilledY - 2;
-      } else {
-        maxY = Constants.ROWS - 2;
+      // If it's outside the playground and it
+      // has a wall to the left
+      if (finalY < 0 && x <= 0) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [1, y]
+        });
+      // If it's outside the playground
+      } else if (finalY < 0) {
+        this.setState({ rotation: rotation + 1 });
+      // If it has a wall to the left and nothing
+      // to the right, move 1 to the right
+      } else if (x <= 0 && cellContent[finalY][x + 1] < 0) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [1, y]
+        });
+      // If it has a filled block to the left and
+      // nothing to the right, move 1 to the right
+      } else if (
+        cellContent[finalY][x - 1] > -1 &&
+        cellContent[finalY][x + 1] < 0
+      ) {
+        this.setState({
+          rotation: rotation + 1,
+          position: [x + 1, y]
+        });
+      // If it doesn't have anything to the right,
+      // carry on with the rotation
+      } else if (cellContent[finalY][x - 1] < 0 && x > 0) {
+        this.setState({ rotation: rotation + 1 });
       }
+      // If none of the above happened, do nothing
     } else if (absRotation === 3) {
       /*
          ───── ─────
         ▐     ▐  ☼  ▐
          ───── ─────
       */
-      // Checking if the 2 columns have anything below
-      const belowFilledYLeft = cellContent
-                               .map(line => line[x - 1])
-                               .findIndex(color => color >= 0);
-
-      const belowFilledYRight = cellContent
-                                .map(line => line[x])
-                                .findIndex(color => color >= 0);
-
-      // If any of the lines have something below
-      if (belowFilledYLeft >= 0 || belowFilledYRight >= 0) {
-        // If both lines have something below
-        if (belowFilledYLeft >= 0 && belowFilledYRight >= 0) {
-          // If left is higher than right (yeah, less means higher in that case)
-          if (belowFilledYLeft < belowFilledYRight) {
-            maxY = belowFilledYLeft - 1;
-          // If right is higher than left
-          } else {
-            maxY = belowFilledYRight - 1;
-          }
-        // If only left one has something below
-        } else if (belowFilledYLeft >= 0) {
-          maxY = belowFilledYLeft - 1;
-        // If only right one has something below
-        } else {
-          maxY = belowFilledYRight - 1;
-        }
-      // If nothing is below
-      } else {
-        maxY = Constants.ROWS - 1;
-      }
+      // Nothing can block this from happening
+      this.setState({ rotation: rotation + 1 });
     }
-
-    if (y < maxY) {
-      this.setState({ position: [x, y + .5] });
-    }
-
-    // Make it so it checkes again in "(11 - speed) * 30" miliseconds
-    this.blockTimeout = setTimeout(this.blockGravity.bind(this), (11 - speed) * 30)
   }
 
-  rotateCounterclockwise() {
+  moveLeft() {
     const { game: { cellContent } }      = this.props;
     const { position: [x, y], rotation } = this.state;
     const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
-    // Try so that it doesn't throw an error
-    // if it's outside of the screen.
-    try {
-      if (absRotation === 0) {
+    // Move if it's outside the playground
+    if (finalY < 0 && ((absRotation === 3 && x > 1) || ((absRotation === 0 || absRotation === 1 || absRotation === 2) && x > 0))) {
+      this.setState({ position: [x - 1, y] });
+    // Move if nothing is blocking on the left
+    } else if (
+      !(
         /*
            ─────
-          ▐     ▐
-           ─────
-          ▐  ☼  ▐
+          ▐     ▐         ───── ─────
+           ─────    or   ▐  ☼  ▐     ▐
+          ▐  ☼  ▐         ───── ─────
            ─────
         */
-        // If it has a wall to the left and nothing
-        // to the right, move 1 to the right
-        if (x <= 0 && cellContent[finalY][x + 1] < 0) {
-          this.setState({
-            rotation: rotation - 1,
-            position: [1, y]
-          });
-        // If it has a filled block to the left and
-        // nothing to the right, move 1 to the right
-        } else if (
-          cellContent[finalY][x - 1] > -1 &&
-          cellContent[finalY][x + 1] < 0
-        ) {
-          this.setState({
-            rotation: rotation - 1,
-            position: [x + 1, y]
-          });
-        // If it doesn't have anything to the left,
-        // carry on with the rotation
-        } else if (cellContent[finalY][x - 1] < 0 && x > 0) {
-          this.setState({ rotation: rotation - 1 });
-        }
-        // If none of the above happened, do nothing
-      } else if (absRotation === 1) {
-        /*
-           ───── ─────
-          ▐  ☼  ▐     ▐
-           ───── ─────
-        */
-        // Nothing can block this from happening
-        this.setState({ rotation: rotation - 1 });
-      } else if (absRotation === 2) {
+        (absRotation === 0 || absRotation === 1) &&
+        (x <= 0 || cellContent[finalY][x - 1] > -1)
+      ) && !(
         /*
            ─────
           ▐  ☼  ▐
@@ -435,97 +551,67 @@ class Block extends React.Component {
           ▐     ▐
            ─────
         */
-        // If it has a wall to the right and nothing
-        // to the left, move 1 to the left
-        if (x >= Constants.COLUMNS - 1 && cellContent[finalY][x - 1] < 0) {
-          this.setState({
-            rotation: rotation - 1,
-            position: [Constants.COLUMNS - 2, y]
-          });
-        // If it has a filled block to the right and
-        // nothing to the left, move 1 to the left
-        } else if (
-          cellContent[finalY][x + 1] > -1 &&
-          cellContent[finalY][x - 1] < 0
-        ) {
-          this.setState({
-            rotation: rotation - 1,
-            position: [x - 1, y]
-          });
-        // If it doesn't have anything to the right,
-        // carry on with the rotation
-        } else if (cellContent[finalY][x + 1] < 0 && x < Constants.COLUMNS - 1) {
-          this.setState({ rotation: rotation - 1 });
-        }
-        // If none of the above happened, do nothing
-      } else if (absRotation === 3) {
+        absRotation === 2 &&
+        (x <= 0 || cellContent[finalY + 1][x - 1] > -1)
+      ) && !(
         /*
            ───── ─────
           ▐     ▐  ☼  ▐
            ───── ─────
         */
-        // If touching the floor, move 1 up
-        if (finalY >= Constants.ROWS - 1) {
-          this.setState({
-            rotation: rotation - 1,
-            position: [x, Constants.ROWS - 2]
-          });
-        // If it has a filled block underneath, move 1 up
-        } else if (cellContent[finalY + 1][x] > -1) {
-          this.setState({
-            rotation: rotation - 1,
-            position: [x, y - 1]
-          });
-        // If none of the above happened, carry on
-        // with the rotation
-        } else {
-          this.setState({ rotation: rotation - 1 });
-        }
-      }
-    } catch(error) {}
+        absRotation === 3 &&
+        (x <= 1 || cellContent[finalY][x - 2] > -1)
+      )
+    ) {
+      this.setState({ position: [x - 1, y] });
+    }
   }
 
-  rotateClockwise() {
+  moveRight() {
     const { game: { cellContent } }      = this.props;
     const { position: [x, y], rotation } = this.state;
     const absRotation = this.getAbsRotation(rotation);
     const finalY = Math.ceil(y);
 
-    // Try so that it doesn't throw an error
-    // if it's outside of the screen.
-    try {
-      if (absRotation === 0) {
+    // Move if it's outside the playground
+    if (finalY < 0 && ((absRotation === 1 && x < Constants.COLUMNS - 2) || ((absRotation === 0 || absRotation === 2 || absRotation === 3) && x < Constants.COLUMNS - 1))) {
+      this.setState({ position: [x + 1, y] });
+    // Move if nothing is blocking on the right
+    } else if (
+      !(
         /*
            ─────
-          ▐     ▐
+          ▐     ▐         ───── ─────
+           ─────    or   ▐     ▐  ☼  ▐
+          ▐  ☼  ▐         ───── ─────
+           ─────
+        */
+        (absRotation === 0 || absRotation === 3) &&
+        (x >= Constants.COLUMNS - 1 || cellContent[finalY][x + 1] > -1)
+      ) && !(
+        /*
            ─────
           ▐  ☼  ▐
            ─────
+          ▐     ▐
+           ─────
         */
-        // If it has a wall to the right and nothing
-        // to the left, move 1 to the left
-        if (x >= Constants.COLUMNS - 1 && cellContent[finalY][x - 1] < 0) {
-          this.setState({
-            rotation: rotation + 1,
-            position: [Constants.COLUMNS - 2, y]
-          });
-        // If it has a filled block to the right and
-        // nothing to the left, move 1 to the left
-        } else if (
-          cellContent[finalY][x + 1] > -1 &&
-          cellContent[finalY][x - 1] < 0
-        ) {
-          this.setState({
-            rotation: rotation + 1,
-            position: [x - 1, y]
-          });
-        // If it doesn't have anything to the right,
-        // carry on with the rotation
-        } else if (cellContent[finalY][x + 1] < 0 && x < Constants.COLUMNS - 1) {
-          this.setState({ rotation: rotation + 1 });
-        }
-        // If none of the above happened, do nothing
-      } else if (absRotation === 1) {
+        absRotation === 2 &&
+        (x >= Constants.COLUMNS - 1 || cellContent[finalY + 1][x + 1] > -1)
+      ) && !(
+        /*
+           ───── ─────
+          ▐  ☼  ▐     ▐
+           ───── ─────
+        */
+        absRotation === 1 &&
+        (x >= Constants.COLUMNS - 2 || cellContent[finalY][x + 2] > -1)
+      )
+    ) {
+      this.setState({ position: [x + 1, y] });
+    }
+  }
+
   checkForBlockPlacement() {
     const { game: { cellContent } }      = this.props;
     const { position: [x, y], rotation } = this.state;
