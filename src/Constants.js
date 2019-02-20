@@ -1,5 +1,6 @@
-export const COLUMNS         = 6;
-export const ROWS            = 12;
+export const COLUMNS           = 6;
+export const ROWS              = 12;
+export const PLACE_BLOCK_DELAY = 1000;
 
 export const getColor = n => {
   switch(n) {
