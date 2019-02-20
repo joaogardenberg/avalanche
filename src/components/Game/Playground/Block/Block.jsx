@@ -129,12 +129,38 @@ class Block extends React.Component {
   }
 
   onKeyDown({ keyCode }) {
-    if (![32, 37, 39, 67, 86].includes(keyCode)) {
+    /*
+      space = 32
+      left  = 37
+      up    = 38
+      right = 39
+      down  = 40
+      C     = 67
+      V     = 86
+    */
+
+    const { blockInput, fullGravity, keysPressed } = this.state;
+
+    if (blockInput || ![32, 37, 38, 39, 40, 67, 86].includes(keyCode)) {
       return false;
     }
 
     if (keyCode === 32) {
       this.setState({ shouldPlaceBlock: true });
+    } else if (keyCode === 40 && !fullGravity) {
+      this.setState({ fullGravity: true });
+
+      if (this.blockTimeout) {
+        clearTimeout(this.blockTimeout);
+        this.blockTimeout = null;
+      }
+
+      if (this.placeBlockTimeout) {
+        clearTimeout(this.placeBlockTimeout);
+        this.placeBlockTimeout = null;
+      }
+
+      this.blockGravity();
     } else if (keyCode === 67) {
       if (!this.rotateCounterclockwiseKeyPressed) {
         this.rotateCounterclockwise();
@@ -145,32 +171,38 @@ class Block extends React.Component {
         this.rotateClockwise();
         this.rotateClockwiseKeyPressed = true;
       }
-    } else if (keyCode === 37) {
-      if (!this.moveLeftKeyPressed) {
-        this.moveLeft();
-        this.moveLeftKeyPressed = true;
-      }
-    } else if (keyCode === 39) {
-      if (!this.moveRightKeyPressed) {
-        this.moveRight();
-        this.moveRightKeyPressed = true;
-      }
+    } else if (keyCode === 37 && !keysPressed[37]) {
+      this.firstLeftMovement = true;
+      this.setState({ keysPressed: { ...keysPressed, 37: new Date().getTime() } });
+      this.keysPressedChecker();
+      this.initKeysPressedInterval();
+    } else if (keyCode === 39 && !keysPressed[39]) {
+      this.firstRightMovement = true;
+      this.setState({ keysPressed: { ...keysPressed, 39: new Date().getTime() } });
+      this.keysPressedChecker();
+      this.initKeysPressedInterval();
     }
   }
 
   onKeyUp({ keyCode }) {
-    if (![32, 37, 39, 67, 86].includes(keyCode)) {
+    const { keysPressed } = this.state;
+
+    if (![32, 37, 38, 39, 40, 67, 86].includes(keyCode)) {
       return false;
     }
 
-    if (keyCode === 67) {
+    if (keyCode === 40) {
+      this.setState({ fullGravity: false });
+    } else if (keyCode === 67) {
       this.rotateCounterclockwiseKeyPressed = false;
     } else if (keyCode === 86) {
       this.rotateClockwiseKeyPressed = false;
     } else if (keyCode === 37) {
-      this.moveLeftKeyPressed = false;
+      delete keysPressed['37'];
+      this.setState({ keysPressed });
     } else if (keyCode === 39) {
-      this.moveRightKeyPressed = false;
+      delete keysPressed['39'];
+      this.setState({ keysPressed });
     }
   }
 
@@ -181,6 +213,28 @@ class Block extends React.Component {
   initKeysPressedInterval() {
     clearInterval(this.keysPressedInterval);
     this.keysPressedInterval = setInterval(this.keysPressedChecker.bind(this), 30);
+  }
+
+  keysPressedChecker() {
+    const { keysPressed } = this.state;
+
+    if (keysPressed[37] && !keysPressed[39]) {
+      if (this.firstLeftMovement) {
+        this.moveLeft();
+        this.firstLeftMovement = false;
+      } else if (new Date().getTime() > keysPressed[37] + 170) {
+        this.moveLeft();
+      }
+    }
+
+    if (keysPressed[39] && !keysPressed[37]) {
+      if (this.firstRightMovement) {
+        this.moveRight();
+        this.firstRightMovement = false;
+      } else if (new Date().getTime() > keysPressed[39] + 170) {
+        this.moveRight();
+      }
+    }
   }
 
   getBlockStyle() {
