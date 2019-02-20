@@ -835,6 +835,8 @@ class Block extends React.Component {
     }
   }
 
+  sleep(ms) {
+    return new Promise(resolve => this.sleepTimeout = setTimeout(resolve, ms));
   }
 }
 
