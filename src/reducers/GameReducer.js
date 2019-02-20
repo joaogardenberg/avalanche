@@ -16,6 +16,7 @@ const INITIAL_STATE = {
   currentBlock: null,
   nextBlock: null,
   speed: 5,
+  cellDelay: 500,
   cellSize: 40,
   cellContent: initialCells()
 };
