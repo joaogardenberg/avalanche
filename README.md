@@ -1,6 +1,6 @@
 # Avalanche
 
-### Heroku app
+### Demo on Heroku
 
 https://mighty-temple-40222.herokuapp.com/
 
