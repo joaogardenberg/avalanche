@@ -439,8 +439,6 @@ class Block extends React.Component {
       this.checkForBlockPlacement();
     }
 
-
-
     // Make it so it checkes again in <gravity> miliseconds
     this.blockTimeout = setTimeout(this.blockGravity.bind(this), this.getGravity())
   }
